@@ -1,3 +1,6 @@
+using System.IO;
+using Type_faster.Model;
+
 namespace Type_faster.View
 {
     public partial class MainForm : System.Windows.Forms.Form
@@ -5,11 +8,15 @@ namespace Type_faster.View
         public MainForm()
         {
             InitializeComponent();
+            LoadBestScore();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void LoadBestScore()
         {
-
+            var repo = new ScoreRepository(
+                Path.Combine(Application.StartupPath, "Dictionaries"));
+            _bestScore = repo.LoadBestScore();
+            lblBestScore.Text = $"Рекорд: {_bestScore}";
         }
     }
 }

@@ -7,6 +7,8 @@ namespace Type_faster.View
         void UpdateWord(string displayWord);
         void UpdateXP(int xp);
         void UpdateTimer(TimeSpan timeLeft);
+        void UpdateCombo(string comboText);
+        void UpdateEventMessage(string message);
         void ShowEndScreen(int finalXP);
 
         event Action OnStartClicked;

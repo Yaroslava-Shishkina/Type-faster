@@ -24,9 +24,12 @@ namespace Type_faster.Presenter
             _model.OnXPChanged += _view.UpdateXP;
             _model.OnWordChanged += _view.UpdateWord;
             _model.OnTimerChanged += _view.UpdateTimer;
+            _model.OnComboChanged += _view.UpdateCombo;
+            _model.OnEventMessage += _view.UpdateEventMessage;
             _model.OnGameEnded += _view.ShowEndScreen;
 
-            _model.OnXPChanged += (xp) => { }; 
         }
     }
+
+
 }
