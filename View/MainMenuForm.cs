@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Text;
 using System.IO;
 using System.Windows.Forms;
 using Type_faster.Model;
@@ -12,6 +14,8 @@ namespace Type_faster.View
         private Button btnStartGame;
         private Button btnSettings;
         private List<string>? _selectedWords;
+        private PrivateFontCollection _fonts = new();
+        private FontFamily? _pangolin;
 
         private static string LastDictPath =>
             Path.Combine(Application.StartupPath, "last_dictionary.txt");
@@ -19,13 +23,25 @@ namespace Type_faster.View
         public MainMenuForm()
         {
             Text = "Type Faster";
-            Size = new System.Drawing.Size(300, 200);
+            Size = new Size(900, 600);
             StartPosition = FormStartPosition.CenterScreen;
             MaximizeBox = false;
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            BackColor = Color.FromArgb(245, 245, 245);
 
+            LoadFont();
             InitializeControls();
             LoadLastDictionary();
+        }
+
+        private void LoadFont()
+        {
+            string fontPath = Path.Combine(Application.StartupPath, "cosmetic", "Pangolin-Regular.ttf");
+            if (File.Exists(fontPath))
+            {
+                _fonts.AddFontFile(fontPath);
+                _pangolin = _fonts.Families[0];
+            }
         }
 
         private void LoadLastDictionary()
@@ -39,39 +55,76 @@ namespace Type_faster.View
                 _selectedWords = repo.LoadDictionary(name);
         }
 
+        private Font GetPangolinFont(float emSize, FontStyle style = FontStyle.Regular)
+        {
+            return _pangolin != null
+                ? new Font(_pangolin, emSize, style)
+                : new Font("Segoe UI", emSize * 0.6f, style);
+        }
+
         private void InitializeControls()
         {
+            int formW = ClientSize.Width;
+            int btnW = 400;
+            int btnH = 100;
+            int titleH = 120;
+            int x = (formW - btnW) / 2;
+
             var lblTitle = new Label
             {
                 Text = "Type Faster!",
-                Font = new System.Drawing.Font("Consolas", 20, System.Drawing.FontStyle.Bold),
-                TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Top,
-                Height = 60
+                Font = GetPangolinFont(48, FontStyle.Bold),
+                TextAlign = ContentAlignment.MiddleCenter,
+                Size = new Size(btnW, titleH),
+                Location = new Point(x, 80),
+                ForeColor = Color.FromArgb(50, 50, 50)
             };
 
             btnStartGame = new Button
             {
                 Text = "Начать игру",
-                Font = new System.Drawing.Font("Consolas", 14),
-                Dock = DockStyle.Top,
-                Height = 50
+                Font = GetPangolinFont(26),
+                Size = new Size(btnW, btnH),
+                Location = new Point(x, 240),
+                BackColor = Color.FromArgb(70, 130, 180),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
             };
+            btnStartGame.FlatAppearance.BorderSize = 0;
 
             btnSettings = new Button
             {
                 Text = "Настройки",
-                Font = new System.Drawing.Font("Consolas", 14),
-                Dock = DockStyle.Top,
-                Height = 50
+                Font = GetPangolinFont(26),
+                Size = new Size(btnW, btnH),
+                Location = new Point(x, 360),
+                BackColor = Color.FromArgb(70, 130, 180),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
             };
+            btnSettings.FlatAppearance.BorderSize = 0;
 
-            Controls.Add(btnSettings);
-            Controls.Add(btnStartGame);
+            btnStartGame.MouseEnter += Button_MouseEnter;
+            btnStartGame.MouseLeave += Button_MouseLeave;
+            btnSettings.MouseEnter += Button_MouseEnter;
+            btnSettings.MouseLeave += Button_MouseLeave;
+
             Controls.Add(lblTitle);
+            Controls.Add(btnStartGame);
+            Controls.Add(btnSettings);
 
             btnStartGame.Click += BtnStartGame_Click;
             btnSettings.Click += BtnSettings_Click;
+        }
+
+        private void Button_MouseEnter(object sender, EventArgs e)
+        {
+            ((Button)sender).BackColor = Color.FromArgb(90, 150, 200);
+        }
+
+        private void Button_MouseLeave(object sender, EventArgs e)
+        {
+            ((Button)sender).BackColor = Color.FromArgb(70, 130, 180);
         }
 
         private void BtnStartGame_Click(object sender, EventArgs e)

@@ -16,4 +16,10 @@
     <None Remove="dictionary\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="cosmetic\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

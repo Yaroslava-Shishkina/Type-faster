@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -21,13 +23,19 @@ namespace Type_faster.View
         private Label lblUsedDictionary;
         private ComboBox cmbDictionaries;
         private Button btnLoadDictionary;
+        private PrivateFontCollection _fonts = new();
+        private FontFamily? _pangolin;
 
         public DictionaryForm()
         {
             Text = "Настройки — Управление словарями";
-            Size = new System.Drawing.Size(450, 460);
+            Size = new Size(900, 890);
             StartPosition = FormStartPosition.CenterParent;
+            MaximizeBox = false;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            BackColor = Color.FromArgb(245, 245, 245);
 
+            LoadFont();
             InitializeControls();
 
             string folder = Path.Combine(Application.StartupPath, "Dictionaries");
@@ -35,24 +43,136 @@ namespace Type_faster.View
             RefreshDictionaryList();
         }
 
+        private void LoadFont()
+        {
+            string fontPath = Path.Combine(Application.StartupPath, "cosmetic", "Pangolin-Regular.ttf");
+            if (File.Exists(fontPath))
+            {
+                _fonts.AddFontFile(fontPath);
+                _pangolin = _fonts.Families[0];
+            }
+        }
+
+        private Font GetPangolinFont(float emSize, FontStyle style = FontStyle.Regular)
+        {
+            return _pangolin != null
+                ? new Font(_pangolin, emSize, style)
+                : new Font("Segoe UI", emSize * 0.6f, style);
+        }
+
         private void InitializeControls()
         {
-            lblDictStatus = new Label { Dock = DockStyle.Top, Height = 20, Text = "" };
-            lblAddDictPrompt = new Label { Dock = DockStyle.Top, Height = 30, Text = "Добавьте собственный словарь.", TextAlign = System.Drawing.ContentAlignment.MiddleLeft };
-            lblDictName = new Label { Dock = DockStyle.Top, Height = 20, Text = "Название словаря:" };
-            txtNewDictName = new TextBox { Dock = DockStyle.Top, Height = 30 };
-            lblLoadInstructions = new Label { Dock = DockStyle.Top, Height = 20, Text = "Загрузите файл или вставьте слова в поле ввода." };
-            txtWordsInput = new TextBox { Dock = DockStyle.Top, Height = 80, Multiline = true };
-            btnLoadFile = new Button { Text = "Загрузить из файла", Dock = DockStyle.Top, Height = 30 };
+            lblDictStatus = new Label
+            {
+                Dock = DockStyle.Top,
+                Height = 40,
+                Text = "",
+                Font = GetPangolinFont(16),
+                ForeColor = Color.Green,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            lblAddDictPrompt = new Label
+            {
+                Dock = DockStyle.Top,
+                Height = 53,
+                Text = "Добавьте собственный словарь.",
+                TextAlign = ContentAlignment.MiddleLeft,
+                Font = GetPangolinFont(20, FontStyle.Bold),
+                ForeColor = Color.FromArgb(50, 50, 50)
+            };
+            lblDictName = new Label
+            {
+                Dock = DockStyle.Top,
+                Height = 33,
+                Text = "Название словаря:",
+                Font = GetPangolinFont(18),
+                ForeColor = Color.DimGray
+            };
+            txtNewDictName = new TextBox
+            {
+                Dock = DockStyle.Top,
+                Height = 35,
+                Font = GetPangolinFont(18)
+            };
+            lblLoadInstructions = new Label
+            {
+                Dock = DockStyle.Top,
+                Height = 33,
+                Text = "Загрузите файл или вставьте слова в поле ввода.",
+                Font = GetPangolinFont(16),
+                ForeColor = Color.DimGray
+            };
+            txtWordsInput = new TextBox
+            {
+                Dock = DockStyle.Top,
+                Height = 200,
+                Multiline = true,
+                Font = GetPangolinFont(16),
+                ScrollBars = ScrollBars.Vertical
+            };
+            btnLoadFile = new Button
+            {
+                Text = "Загрузить из файла",
+                Dock = DockStyle.Top,
+                Height = 60,
+                Font = GetPangolinFont(20),
+                BackColor = Color.FromArgb(70, 130, 180),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnLoadFile.FlatAppearance.BorderSize = 0;
+            btnLoadFile.MouseEnter += (s, e) => btnLoadFile.BackColor = Color.FromArgb(90, 150, 200);
+            btnLoadFile.MouseLeave += (s, e) => btnLoadFile.BackColor = Color.FromArgb(70, 130, 180);
+
             var spacer = new Label { Dock = DockStyle.Top, Height = 20 };
-            btnSaveDictionary = new Button { Text = "Сохранить словарь", Dock = DockStyle.Top, Height = 30 };
-            lblUsedDictionary = new Label { Dock = DockStyle.Top, Height = 20, Text = "Используемый словарь:" };
-            cmbDictionaries = new ComboBox { Dock = DockStyle.Top, Height = 30, DropDownStyle = ComboBoxStyle.DropDownList };
-            btnLoadDictionary = new Button { Text = "Загрузить в игру", Dock = DockStyle.Top, Height = 30 };
+
+            btnSaveDictionary = new Button
+            {
+                Text = "Сохранить словарь",
+                Dock = DockStyle.Top,
+                Height = 60,
+                Font = GetPangolinFont(20),
+                BackColor = Color.FromArgb(70, 130, 180),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnSaveDictionary.FlatAppearance.BorderSize = 0;
+            btnSaveDictionary.MouseEnter += (s, e) => btnSaveDictionary.BackColor = Color.FromArgb(90, 150, 200);
+            btnSaveDictionary.MouseLeave += (s, e) => btnSaveDictionary.BackColor = Color.FromArgb(70, 130, 180);
+
+            lblUsedDictionary = new Label
+            {
+                Dock = DockStyle.Top,
+                Height = 33,
+                Text = "Используемый словарь:",
+                Font = GetPangolinFont(18),
+                ForeColor = Color.DimGray
+            };
+            cmbDictionaries = new ComboBox
+            {
+                Dock = DockStyle.Top,
+                Height = 35,
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Font = GetPangolinFont(18)
+            };
+            btnLoadDictionary = new Button
+            {
+                Text = "Загрузить в игру",
+                Dock = DockStyle.Top,
+                Height = 60,
+                Font = GetPangolinFont(20),
+                BackColor = Color.FromArgb(70, 130, 180),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnLoadDictionary.FlatAppearance.BorderSize = 0;
+            btnLoadDictionary.MouseEnter += (s, e) => btnLoadDictionary.BackColor = Color.FromArgb(90, 150, 200);
+            btnLoadDictionary.MouseLeave += (s, e) => btnLoadDictionary.BackColor = Color.FromArgb(70, 130, 180);
 
             Controls.Add(btnLoadDictionary);
             Controls.Add(cmbDictionaries);
             Controls.Add(lblUsedDictionary);
+            Controls.Add(new Label { Dock = DockStyle.Top, Height = 15 });
             Controls.Add(btnSaveDictionary);
             Controls.Add(spacer);
             Controls.Add(btnLoadFile);
@@ -61,6 +181,7 @@ namespace Type_faster.View
             Controls.Add(txtNewDictName);
             Controls.Add(lblDictName);
             Controls.Add(lblAddDictPrompt);
+            Controls.Add(new Label { Dock = DockStyle.Top, Height = 5 });
             Controls.Add(lblDictStatus);
 
             btnLoadDictionary.Click += (s, e) => LoadSelectedDictionary();
@@ -143,13 +264,13 @@ namespace Type_faster.View
 
         private void SetStatus(string msg)
         {
-            lblDictStatus.ForeColor = System.Drawing.Color.Green;
+            lblDictStatus.ForeColor = Color.Green;
             lblDictStatus.Text = msg;
         }
 
         private void SetError(string msg)
         {
-            lblDictStatus.ForeColor = System.Drawing.Color.Red;
+            lblDictStatus.ForeColor = Color.Red;
             lblDictStatus.Text = msg;
         }
     }
